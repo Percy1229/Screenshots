@@ -11,18 +11,18 @@ from selenium.webdriver.chrome.options import Options
 
 
 options = Options()
-DRIVER_PATH = '/Users/mizuki1998/Downloads/chromedriver'
+DRIVER_PATH = '{}/Downloads/chromedriver'.format(os.environ['USER_PATH'])
 
 # Select File for screenshots
 FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '/Users/mizuki1998/PycharmProjects/Screenshots/images/ticket.png')
+                        '..images/ticket.png')
 
 
 # class PythonTest(unittest.TestCase):
 #     def setUp(self):
     #     self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
     #                                    options=options)
-    #     os.chdir('/Users/mizuki1998/PycharmProjects/Screenshots/images')
+    #     os.chdir('../images')
     #
     # def screenshot(self):
     #

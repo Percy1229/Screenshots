@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 options = Options()
-DRIVER_PATH = '/Users/mizuki1998/Downloads/chromedriver'
+DRIVER_PATH = '{}/Downloads/chromedriver'.format(os.environ['USER_PATH'])
 
 class TestRestaurant(object):
     def setup_method(self):
