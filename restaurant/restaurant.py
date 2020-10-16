@@ -38,13 +38,21 @@ class RestaurantPage:
 
         #if title is not normal and raise error
 
-        # pick up day
+        # open calendar
         calendar_img = self.driver.find_element_by_class_name(
             'ui-datepicker-trigger')
         calendar_img.click()
+        time.sleep(1)
 
+        # set month
+        next_page = 'a.ui-datepicker-next.ui-corner-all'
+        select_month = self.driver.find_element_by_css_selector(next_page)
+        select_month.click()
+
+        # set day
         day = self.driver.find_element_by_link_text(self.day)
         day.click()
+
 
         select_element = self.driver.find_element_by_id('searchAdultNum')
         select_num_pp = Select(select_element)
@@ -88,8 +96,13 @@ class RestaurantPage:
         payload = {'message': text.format(title=self.title, day=self.day)}
         requests.post(notify_url, data=payload, headers=headers, files=files)
 
-#　お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
-# bash.fileにトークンを入れる方法
+# 11月の状況を取得できるように
+# お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
 # 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
+
+restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
+restaurant.search_restaurant()
+restaurant.take_screenshot()
+restaurant.send_line()
 
 
