@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+from datetime import date
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,9 +22,10 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, day, title, pic_name):
+    def __init__(self, month, day, title, pic_name):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
+        self.month = month
         self.day = day
         self.title = title
         self.pic_name = pic_name
@@ -45,15 +47,17 @@ class RestaurantPage:
         time.sleep(1)
 
         # set month
-        next_page = 'a.ui-datepicker-next.ui-corner-all'
-        select_month = self.driver.find_element_by_css_selector(next_page)
-        select_month.click()
+        this_month = date.today().month
+        if self.month > this_month:
+            next_page = 'a.ui-datepicker-next.ui-corner-all'
+            select_month = self.driver.find_element_by_css_selector(next_page)
+            select_month.click()
 
         # set day
         day = self.driver.find_element_by_link_text(self.day)
         day.click()
 
-
+        # num of pp
         select_element = self.driver.find_element_by_id('searchAdultNum')
         select_num_pp = Select(select_element)
         select_num_pp.select_by_value('2')
@@ -100,7 +104,7 @@ class RestaurantPage:
 # お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
 # 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
 
-restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
+restaurant = RestaurantPage(10, '19', 'レストラン', 'restaurant')
 restaurant.search_restaurant()
 restaurant.take_screenshot()
 restaurant.send_line()
