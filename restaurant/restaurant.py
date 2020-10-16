@@ -31,12 +31,11 @@ class RestaurantPage:
             os.environ['USER_PATH']))
 
     def search_restaurant(self):
+        # if title is not normal and raise error
         try:
             self.driver.get(restaurant_url)
         except NoSuchElementException:
             print('つながりにくい状況です')
-
-        #if title is not normal and raise error
 
         # pick up day
         calendar_img = self.driver.find_element_by_class_name(
@@ -89,7 +88,6 @@ class RestaurantPage:
         requests.post(notify_url, data=payload, headers=headers, files=files)
 
 #　お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
-# bash.fileにトークンを入れる方法
 # 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
 
 
