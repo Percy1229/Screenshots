@@ -22,17 +22,16 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, month, day, title, pic_name):
+    def __init__(self, day, title, pic_name):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
-        self.month = month
         self.day = day
         self.title = title
         self.pic_name = pic_name
         os.chdir('{}/PycharmProjects/Screenshots/images'.format(
             os.environ['USER_PATH']))
 
-    def search_restaurant(self):
+    def search_restaurant(self, month):
         try:
             self.driver.get(restaurant_url)
         except NoSuchElementException:
@@ -48,7 +47,7 @@ class RestaurantPage:
 
         # set month
         this_month = date.today().month
-        if self.month > this_month:
+        if month > this_month:
             next_page = 'a.ui-datepicker-next.ui-corner-all'
             select_month = self.driver.find_element_by_css_selector(next_page)
             select_month.click()
@@ -100,13 +99,11 @@ class RestaurantPage:
         payload = {'message': text.format(title=self.title, day=self.day)}
         requests.post(notify_url, data=payload, headers=headers, files=files)
 
-# 11月の状況を取得できるように
 # お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
 # 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
 
-restaurant = RestaurantPage(10, '19', 'レストラン', 'restaurant')
-restaurant.search_restaurant()
-restaurant.take_screenshot()
-restaurant.send_line()
 
-
+restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
+restaurant.search_restaurant(10)
+# restaurant.take_screenshot()
+# restaurant.send_line()

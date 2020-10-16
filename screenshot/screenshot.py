@@ -173,15 +173,15 @@ time.sleep(1)
 
 
 # ticket for next month
-# b = Ticket('11', 'チケット', 'ticket-e')
-# b.take_ticket_pic()
-# b.cut_screenshot()
-# b.send_line()
-#
-# time.sleep(1)
-#
-# # Restaurant for this month only
-# restaurant = RestaurantPage('20', 'レストラン', 'restaurant')
-# restaurant.search_restaurant()
-# restaurant.take_screenshot()
-# restaurant.send_line()
+b = Ticket('11', 'チケット', 'ticket-e')
+b.take_ticket_pic()
+b.cut_screenshot()
+b.send_line()
+
+time.sleep(1)
+
+# Restaurant for this month only
+restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
+restaurant.search_restaurant(10)
+restaurant.take_screenshot()
+restaurant.send_line()
