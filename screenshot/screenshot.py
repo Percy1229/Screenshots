@@ -64,7 +64,7 @@ class Ticket(RestaurantPage):
             self.dl_state = 'TDL: ○ {} + △ {} = 残り{}枠です'.format(
                 dl_circle_num, dl_few_num, dl_available_day)
         else:
-            self.dl_state = 'TDL:現在、売り切れです'
+            self.dl_state = 'TDL:現在、販売しておりません'
 
         # total available day (DS)
         # total △
@@ -83,7 +83,7 @@ class Ticket(RestaurantPage):
                 ds_circle_num, ds_few_num, ds_available_day)
 
         else:
-            self.ds_state = 'TDL:現在、売り切れです'
+            self.ds_state = 'TDL:現在、販売しておりません'
 
         # TDL circle and few AM8:00
 
