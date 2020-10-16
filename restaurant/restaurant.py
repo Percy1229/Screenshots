@@ -10,12 +10,12 @@ from selenium.common.exceptions import NoSuchElementException
 options = Options()
 
 # set directory
-img_dir = '/Users/mizuki1998/PycharmProjects/Screenshots/images/restaurant.png'
+image_dir = '../images/restaurant.png'
 
 # chrome driver path
-DRIVER_PATH = '/Users/mizuki1998/Downloads/chromedriver'
+DRIVER_PATH = '{}/Downloads/chromedriver'.format(os.environ['USER_PATH'])
 
-FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), img_dir)
+FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_dir)
 
 restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
@@ -27,7 +27,8 @@ class RestaurantPage:
         self.day = day
         self.title = title
         self.pic_name = pic_name
-        os.chdir('/Users/mizuki1998/PycharmProjects/Screenshots/images')
+        os.chdir('{}/PycharmProjects/Screenshots/images'.format(
+            os.environ['USER_PATH']))
 
     def search_restaurant(self):
         try:

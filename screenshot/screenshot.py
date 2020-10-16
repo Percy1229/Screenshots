@@ -8,10 +8,11 @@ from PIL import Image
 from restaurant.restaurant import RestaurantPage
 
 # set image directory
-image_dir = '/Users/mizuki1998/PycharmProjects/Screenshots/images/ticket.png'
+image_dir = '../images/ticket.png'
 
 # Select File for screenshots
 FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_dir)
+
 
 ticket_url = "https://www.tokyodisneyresort.jp/ticket/sales_status/2020{}/"
 
@@ -20,19 +21,6 @@ class Ticket(RestaurantPage):
     def __init__(self, day, title, pic_name):
         super(Ticket, self).__init__(day, title, pic_name)
 
-    @staticmethod
-    def cut_screenshot():
-        # resize and cut the screenshot
-        screenshot = Image.open('ticket.png')
-        width, height = screenshot.size
-        left = width - 1010
-        top = 0
-        right = width - 400
-        bottom = height - 62
-        image = screenshot.crop((left, top, right, bottom))
-        image.save('ticket-e.png')
-
-    #
     def take_ticket_pic(self):
         self.driver.get(ticket_url.format(self.day))
 
@@ -139,6 +127,18 @@ class Ticket(RestaurantPage):
         self.driver.save_screenshot(FILENAME)
         self.driver.quit()
 
+    @staticmethod
+    def cut_screenshot():
+        # resize and cut the screenshot
+        screenshot = Image.open('ticket.png')
+        width, height = screenshot.size
+        left = width - 1010
+        top = 0
+        right = width - 400
+        bottom = height - 62
+        image = screenshot.crop((left, top, right, bottom))
+        image.save('ticket-e.png')
+
     def send_line(self):
         notify_url = 'https://notify-api.line.me/api/notify'
         # problem: token is exposed, hide it to bash.file
@@ -163,7 +163,7 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-a = Ticket('10', 'チケット', 'ticket-e')
+a = Ticket('12', 'チケット', 'ticket-e')
 a.take_ticket_pic()
 a.cut_screenshot()
 a.send_line()
