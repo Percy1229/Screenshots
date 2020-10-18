@@ -87,7 +87,7 @@ class RestaurantPage:
 
         self.cur_url = self.driver.current_url
 
-    def take_screenshot(self):
+    def take_pic(self):
         try:
             self.driver.get(self.cur_url)
         except NoSuchElementException:
@@ -124,5 +124,5 @@ class RestaurantPage:
 
 # restaurant = RestaurantPage(10, '19')
 # restaurant.search_restaurant()
-# restaurant.take_screenshot()
+# restaurant.take_pic()
 # restaurant.send_line()

@@ -162,7 +162,7 @@ class Ticket(RestaurantPage):
                 self.ds_circle_num, self.ds_few_num, self.ds_available_day)
 
     @staticmethod
-    def cut_screenshot():
+    def set_picture():
         # resize and cut the screenshot
         screenshot = Image.open('ticket.png')
         width, height = screenshot.size
@@ -207,9 +207,9 @@ class Ticket(RestaurantPage):
 
 # ticket for next month
 ticket2 = Ticket('11')
-ticket2.take_ticket_pic()
+ticket2.take_pic()
 ticket2.set_message()
-ticket2.cut_screenshot()
+ticket2.set_picture()
 ticket2.send_line()
 
 # time.sleep(1)
@@ -217,5 +217,5 @@ ticket2.send_line()
 # # Restaurant for this month only
 # restaurant = RestaurantPage('19', 10)
 # restaurant.search_restaurant()
-# restaurant.take_screenshot()
+# restaurant.take_pic()
 # restaurant.send_line()
