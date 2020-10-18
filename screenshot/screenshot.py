@@ -24,9 +24,19 @@ class Ticket(RestaurantPage):
 
         self.title = 'チケット'
         self.pic_name = 'ticket-e'
-        self.dl_state = 'TDL:現在、販売しておりません'
-        self.ds_state = 'TDS:現在、販売しておりません'
         self.state = '枠が表示できません'
+        self.circle = 0
+        self.few = 0
+
+        self.dl_state = 'TDL:現在、販売しておりません'
+        self.dl_available_day = 0
+        self.dl_circle_num = 0
+        self.dl_few_num = 0
+
+        self.ds_state = 'TDS:現在、販売しておりません'
+        self.ds_available_day = 0
+        self.ds_circle_num = 0
+        self.ds_few_num = 0
 
     def take_ticket_pic(self):
         self.driver.get(ticket_url.format(self.day))
@@ -35,50 +45,49 @@ class Ticket(RestaurantPage):
         # total x
         none = len(self.driver.find_elements_by_css_selector('div.is-none'))
         # total △
-        few = len(self.driver.find_elements_by_css_selector('div.is-few'))
+        self.few = len(self.driver.find_elements_by_css_selector('div.is-few'))
         # total -
         close = len(self.driver.find_elements_by_css_selector('div.is-close'))
         # total day of both park
         park = (len(self.driver.find_elements_by_css_selector('div.tdl')) - 6)
         total_day = park * 2
-        # total x △ -
-        without_circle = none + few + close
+        without_circle = none + self.few + close
         # total ○
-        circle = total_day - without_circle
-        # set a message for line
-        if circle > 0:
-            self.state = 'TDR:残り{}枠です'.format(circle + few)
-        elif circle == 0 and few > 0:
-            self.state = 'TDR:残り{}枠のみです'.format(few)
-        elif circle == few:
-            self.state = '現在、枠はありません'
+        self.circle = total_day - without_circle
 
         # total available days(DL)
         # total △
         dl_few = self.driver.find_elements_by_css_selector('div.tdl.is-few')
-        dl_few_num = len(dl_few)
+        self.dl_few_num = len(dl_few)
+        # TDL modal info
+        if self.dl_few_num > 0:
+            for content in dl_few:
+                content.find_element_by_tag_name('a').click()
+                time.sleep(1)
+                mdl = self.driver.find_element_by_css_selector(
+                    'div.modalContent')
+                c_btn = mdl.find_element_by_css_selector('div.modalBtnClose')
+                c_btn.click()
+                time.sleep(2)
 
         # total x
         dl_none = self.driver.find_elements_by_css_selector('div.tdl.is-none')
         dl_none_num = len(dl_none)
-        # now sold day
-        sold_day = (few + none + circle) / 2
-        # total ○
-        dl_circle_num = math.floor(sold_day - (dl_few_num + dl_none_num))
-        dl_available_day = dl_circle_num + dl_few_num
 
-        # set a message for line(DL)
-        if dl_available_day > 0:
-            self.dl_state = 'TDL: ○ {} + △ {} = 残り{}枠です'.format(
-                dl_circle_num, dl_few_num, dl_available_day)
+        # open modal and check available day
+        # now sold day
+        sold_day = (self.few + none + self.circle) / 2
+        # total ○
+        self.dl_circle_num = math.floor(sold_day - (self.dl_few_num + dl_none_num))
+        self.dl_available_day = self.dl_circle_num + self.dl_few_num
 
         # total available day (DS)
         # total △
         ds_few = self.driver.find_elements_by_css_selector('div.tds.is-few')
-        ds_few_num = len(ds_few)
+        self.ds_few_num = len(ds_few)
 
-        # open modal and check available day
-        if ds_few_num > 0:
+        # TDS modal info
+        if self.ds_few_num > 0:
             for content in ds_few:
                 content.find_element_by_tag_name('a').click()
                 time.sleep(1)
@@ -91,18 +100,10 @@ class Ticket(RestaurantPage):
         ds_none = self.driver.find_elements_by_css_selector('div.tds.is-none')
         ds_none_num = len(ds_none)
         # total ○
-        ds_circle_num = math.floor(sold_day - (ds_few_num + ds_none_num))
-        ds_available_day = ds_circle_num + ds_few_num
+        self.ds_circle_num = math.floor(sold_day - (self.ds_few_num + ds_none_num))
+        self.ds_available_day = self.ds_circle_num + self.ds_few_num
 
-        # set a message for line(DS)
-        if ds_available_day > 0:
-            self.ds_state = 'TDS: ○ {} + △ {} = 残り{}枠です'.format(
-                ds_circle_num, ds_few_num, ds_available_day)
-
-        # TDL circle and few AM8:00
-
-        # TDS circle and few AM8:00
-
+        # problem: need to split code - add self to define cal or message
         self.driver.execute_script("document.body.style.zoom='70%'")
 
         """
@@ -141,6 +142,25 @@ class Ticket(RestaurantPage):
         self.driver.save_screenshot(FILENAME)
         self.driver.quit()
 
+    def set_message(self):
+        # set a message for line(TDR)
+        if self.circle > 0:
+            self.state = 'TDR:残り{}枠です'.format(self.circle + self.few)
+        elif self.circle == 0 and self.few > 0:
+            self.state = 'TDR:残り{}枠のみです'.format(self.few)
+        elif self.circle == self.few:
+            self.state = '現在、枠はありません'
+
+        # set a message for line(TDL)
+        if self.dl_available_day > 0:
+            self.dl_state = 'TDL: ○ {} + △ {} = 残り{}枠です'.format(
+                self.dl_circle_num, self.dl_few_num, self.dl_available_day)
+
+        # set a message for line(TDS)
+        if self.ds_available_day > 0:
+            self.ds_state = 'TDS: ○ {} + △ {} = 残り{}枠です'.format(
+                self.ds_circle_num, self.ds_few_num, self.ds_available_day)
+
     @staticmethod
     def cut_screenshot():
         # resize and cut the screenshot
@@ -177,19 +197,20 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-# a = Ticket('10')
-# a.take_ticket_pic()
-# a.cut_screenshot()
-# a.send_line()
+# ticket1 = Ticket('10')
+# ticket1.take_ticket_pic()
+# ticket1.cut_screenshot()
+# ticket1.send_line()
 #
 # time.sleep(1)
 
 
 # ticket for next month
-b = Ticket('11')
-b.take_ticket_pic()
-b.cut_screenshot()
-b.send_line()
+ticket2 = Ticket('11')
+ticket2.take_ticket_pic()
+ticket2.set_message()
+ticket2.cut_screenshot()
+ticket2.send_line()
 
 # time.sleep(1)
 #
