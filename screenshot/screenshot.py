@@ -181,7 +181,7 @@ b.send_line()
 time.sleep(1)
 
 # Restaurant for this month only
-restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
-restaurant.search_restaurant(10)
+restaurant = RestaurantPage('19', 'レストラン', 'restaurant', 11)
+restaurant.search_restaurant('ラ・タベルヌ・ド・ガストン')
 restaurant.take_screenshot()
 restaurant.send_line()

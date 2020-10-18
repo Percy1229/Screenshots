@@ -22,16 +22,17 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, day, title, pic_name):
+    def __init__(self, day, title, pic_name, month=10):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
         self.day = day
         self.title = title
         self.pic_name = pic_name
+        self.month = month
         os.chdir('{}/PycharmProjects/Screenshots/images'.format(
             os.environ['USER_PATH']))
 
-    def search_restaurant(self, month, pick_restaurant=None):
+    def search_restaurant(self, pick_restaurant=None):
         try:
             self.driver.get(restaurant_url)
         except NoSuchElementException:
@@ -45,7 +46,7 @@ class RestaurantPage:
 
         # set month
         this_month = date.today().month
-        if month > this_month:
+        if self.month > this_month:
             next_page = 'a.ui-datepicker-next.ui-corner-all'
             select_month = self.driver.find_element_by_css_selector(next_page)
             select_month.click()
@@ -71,9 +72,8 @@ class RestaurantPage:
                     break
 
         search_button = self.driver.find_element_by_id('searchButton')
+        time.sleep(2)
         search_button.click()
-        time.sleep(3)
-
         self.cur_url = self.driver.current_url
 
     def take_screenshot(self):
@@ -103,15 +103,17 @@ class RestaurantPage:
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
         files = {'imageFile': open("{}.png".format(self.pic_name), "rb")}
-        text = '{title}|10月{day}日'
-        payload = {'message': text.format(title=self.title, day=self.day)}
+        text = '{title}\n指定された日付: {month}月{day}日'
+        payload = {'message': text.format(title=self.title,
+                                          month=self.month,
+                                          day=self.day)}
         requests.post(notify_url, data=payload, headers=headers, files=files)
+
 
 # お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
 # 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
 
-
-restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
-restaurant.search_restaurant(11, 'ラ・タベルヌ・ド・ガストン')
-restaurant.take_screenshot()
-restaurant.send_line()
+# restaurant = RestaurantPage('19', 'レストラン', 'restaurant', 11)
+# restaurant.search_restaurant('ラ・タベルヌ・ド・ガストン')
+# restaurant.take_screenshot()
+# restaurant.send_line()
