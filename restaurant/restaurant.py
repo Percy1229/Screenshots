@@ -31,13 +31,11 @@ class RestaurantPage:
         os.chdir('{}/PycharmProjects/Screenshots/images'.format(
             os.environ['USER_PATH']))
 
-    def search_restaurant(self, month):
+    def search_restaurant(self, month, pick_restaurant=None):
         try:
             self.driver.get(restaurant_url)
         except NoSuchElementException:
             print('つながりにくい状況です')
-
-        #if title is not normal and raise error
 
         # open calendar
         calendar_img = self.driver.find_element_by_class_name(
@@ -57,9 +55,20 @@ class RestaurantPage:
         day.click()
 
         # num of pp
-        select_element = self.driver.find_element_by_id('searchAdultNum')
-        select_num_pp = Select(select_element)
+        select_pp = self.driver.find_element_by_id('searchAdultNum')
+        select_num_pp = Select(select_pp)
         select_num_pp.select_by_value('2')
+
+        # choose restaurant name
+        if pick_restaurant is not None:
+            restaurants = self.driver.find_element_by_id('restaurantNameCd')
+            select_restaurant = Select(restaurants)
+            get_options = select_restaurant.options
+            for i in range(len(get_options)):
+                restaurant_name = get_options[i].text
+                if restaurant_name == pick_restaurant:
+                    select_restaurant.select_by_visible_text(pick_restaurant)
+                    break
 
         search_button = self.driver.find_element_by_id('searchButton')
         search_button.click()
@@ -72,7 +81,6 @@ class RestaurantPage:
             self.driver.get(self.cur_url)
         except NoSuchElementException:
             print('つながりにくい状況です')
-
 
         # remove code
         self.driver.execute_script("""
@@ -104,6 +112,6 @@ class RestaurantPage:
 
 
 restaurant = RestaurantPage('19', 'レストラン', 'restaurant')
-restaurant.search_restaurant(10)
-# restaurant.take_screenshot()
-# restaurant.send_line()
+restaurant.search_restaurant(11, 'ラ・タベルヌ・ド・ガストン')
+restaurant.take_screenshot()
+restaurant.send_line()
