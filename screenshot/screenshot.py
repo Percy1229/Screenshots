@@ -18,7 +18,6 @@ FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_dir)
 ticket_url = "https://www.tokyodisneyresort.jp/ticket/sales_status/2020{}/"
 
 
-
 class Ticket(RestaurantPage):
     def __init__(self, day):
         super(Ticket, self).__init__(day)
@@ -31,7 +30,6 @@ class Ticket(RestaurantPage):
 
     def take_ticket_pic(self):
         self.driver.get(ticket_url.format(self.day))
-
 
         # total available day (TDR)
         # total x
@@ -59,6 +57,7 @@ class Ticket(RestaurantPage):
         # total △
         dl_few = self.driver.find_elements_by_css_selector('div.tdl.is-few')
         dl_few_num = len(dl_few)
+
         # total x
         dl_none = self.driver.find_elements_by_css_selector('div.tdl.is-none')
         dl_none_num = len(dl_none)
@@ -77,6 +76,17 @@ class Ticket(RestaurantPage):
         # total △
         ds_few = self.driver.find_elements_by_css_selector('div.tds.is-few')
         ds_few_num = len(ds_few)
+
+        # open modal and check available day
+        if ds_few_num > 0:
+            for content in ds_few:
+                content.find_element_by_tag_name('a').click()
+                time.sleep(1)
+                mdl = self.driver.find_element_by_css_selector('div.modalContent')
+                c_btn = mdl.find_element_by_css_selector('div.modalBtnClose')
+                c_btn.click()
+                time.sleep(2)
+
         # total x
         ds_none = self.driver.find_elements_by_css_selector('div.tds.is-none')
         ds_none_num = len(ds_none)
@@ -167,13 +177,12 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-a = Ticket('10')
-a.take_ticket_pic()
-a.cut_screenshot()
-a.send_line()
-
-# print(os.environ)
-time.sleep(1)
+# a = Ticket('10')
+# a.take_ticket_pic()
+# a.cut_screenshot()
+# a.send_line()
+#
+# time.sleep(1)
 
 
 # ticket for next month
@@ -182,10 +191,10 @@ b.take_ticket_pic()
 b.cut_screenshot()
 b.send_line()
 
-time.sleep(1)
-
-# Restaurant for this month only
-restaurant = RestaurantPage('19', 10)
-restaurant.search_restaurant()
-restaurant.take_screenshot()
-restaurant.send_line()
+# time.sleep(1)
+#
+# # Restaurant for this month only
+# restaurant = RestaurantPage('19', 10)
+# restaurant.search_restaurant()
+# restaurant.take_screenshot()
+# restaurant.send_line()
