@@ -22,17 +22,21 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, day, title, pic_name, month=10):
+    def __init__(self, month=10, day='19', pick_res=None):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
-        self.day = day
-        self.title = title
-        self.pic_name = pic_name
         self.month = month
+        self.day = day
+        self.pick_res = pick_res
+
+        self.title = 'レストラン'
+        self.pic_name = 'restaurant'
+        self.res_status = '現在、予約できません。'
+        self.cur_url = None
         os.chdir('{}/PycharmProjects/Screenshots/images'.format(
             os.environ['USER_PATH']))
 
-    def search_restaurant(self, pick_restaurant=None):
+    def search_restaurant(self):
         try:
             self.driver.get(restaurant_url)
         except NoSuchElementException:
@@ -61,19 +65,26 @@ class RestaurantPage:
         select_num_pp.select_by_value('2')
 
         # choose restaurant name
-        if pick_restaurant is not None:
+        if self.pick_res is not None:
             restaurants = self.driver.find_element_by_id('restaurantNameCd')
             select_restaurant = Select(restaurants)
             get_options = select_restaurant.options
             for i in range(len(get_options)):
                 restaurant_name = get_options[i].text
-                if restaurant_name == pick_restaurant:
-                    select_restaurant.select_by_visible_text(pick_restaurant)
+                if restaurant_name == self.pick_res:
+                    select_restaurant.select_by_visible_text(self.pick_res)
                     break
 
         search_button = self.driver.find_element_by_id('searchButton')
         time.sleep(2)
         search_button.click()
+        restaurant_exist = self.driver.find_elements_by_css_selector('p.name')
+        for each_restaurant in restaurant_exist:
+            if each_restaurant.text == self.pick_res:
+                self.res_status = '現在、予約可能です。'
+                print('YES')
+                break
+
         self.cur_url = self.driver.current_url
 
     def take_screenshot(self):
@@ -103,17 +114,15 @@ class RestaurantPage:
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
         files = {'imageFile': open("{}.png".format(self.pic_name), "rb")}
-        text = '{title}\n指定された日付: {month}月{day}日'
+        text = '{title}\n指定された日付: {month}月{day}日\n{res_status}'
         payload = {'message': text.format(title=self.title,
                                           month=self.month,
-                                          day=self.day)}
+                                          day=self.day,
+                                          res_status=self.res_status)}
         requests.post(notify_url, data=payload, headers=headers, files=files)
 
 
-# お探しのレストランは現在、満席ですを出す(２つ)数を入力できるように
-# 空いていた場合は、clickイベントを発火させ、スクショ、サイトのURLを送付
-
-# restaurant = RestaurantPage('19', 'レストラン', 'restaurant', 11)
-# restaurant.search_restaurant('ラ・タベルヌ・ド・ガストン')
-# restaurant.take_screenshot()
-# restaurant.send_line()
+restaurant = RestaurantPage(10, '19')
+restaurant.search_restaurant()
+restaurant.take_screenshot()
+restaurant.send_line()
