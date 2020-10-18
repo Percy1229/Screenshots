@@ -13,16 +13,25 @@ image_dir = '../images/ticket.png'
 # Select File for screenshots
 FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_dir)
 
+'https://www.tokyodisneyresort.jp/ticket/sales_status/202019/'
 
 ticket_url = "https://www.tokyodisneyresort.jp/ticket/sales_status/2020{}/"
 
 
+
 class Ticket(RestaurantPage):
-    def __init__(self, day, title, pic_name):
-        super(Ticket, self).__init__(day, title, pic_name)
+    def __init__(self, day):
+        super(Ticket, self).__init__(day)
+
+        self.title = 'チケット'
+        self.pic_name = 'ticket-e'
+        self.dl_state = 'TDL:現在、販売しておりません'
+        self.ds_state = 'TDS:現在、販売しておりません'
+        self.state = '枠が表示できません'
 
     def take_ticket_pic(self):
         self.driver.get(ticket_url.format(self.day))
+
 
         # total available day (TDR)
         # total x
@@ -63,8 +72,6 @@ class Ticket(RestaurantPage):
         if dl_available_day > 0:
             self.dl_state = 'TDL: ○ {} + △ {} = 残り{}枠です'.format(
                 dl_circle_num, dl_few_num, dl_available_day)
-        else:
-            self.dl_state = 'TDL:現在、販売しておりません'
 
         # total available day (DS)
         # total △
@@ -81,9 +88,6 @@ class Ticket(RestaurantPage):
         if ds_available_day > 0:
             self.ds_state = 'TDS: ○ {} + △ {} = 残り{}枠です'.format(
                 ds_circle_num, ds_few_num, ds_available_day)
-
-        else:
-            self.ds_state = 'TDS:現在、販売しておりません'
 
         # TDL circle and few AM8:00
 
@@ -144,7 +148,7 @@ class Ticket(RestaurantPage):
         # problem: token is exposed, hide it to bash.file
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
-        text = '{title}|{day}月\n{state}\n{dl_state}\n{ds_state}'
+        text = '{title}\n{day}月\n{state}\n{dl_state}\n{ds_state}'
         text = text.format(title=self.title,
                            day=self.day,
                            state=self.state,
@@ -163,7 +167,7 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-a = Ticket('12', 'チケット', 'ticket-e')
+a = Ticket('10')
 a.take_ticket_pic()
 a.cut_screenshot()
 a.send_line()
@@ -173,7 +177,7 @@ time.sleep(1)
 
 
 # ticket for next month
-b = Ticket('11', 'チケット', 'ticket-e')
+b = Ticket('11')
 b.take_ticket_pic()
 b.cut_screenshot()
 b.send_line()
@@ -181,7 +185,7 @@ b.send_line()
 time.sleep(1)
 
 # Restaurant for this month only
-restaurant = RestaurantPage('19', 'レストラン', 'restaurant', 11)
-restaurant.search_restaurant('ラ・タベルヌ・ド・ガストン')
+restaurant = RestaurantPage('19', 10)
+restaurant.search_restaurant()
 restaurant.take_screenshot()
 restaurant.send_line()

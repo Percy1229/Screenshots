@@ -22,11 +22,11 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, month=10, day='19', pick_res=None):
+    def __init__(self, day, month=10, pick_res=None):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
-        self.month = month
         self.day = day
+        self.month = month
         self.pick_res = pick_res
 
         self.title = 'レストラン'
@@ -122,7 +122,7 @@ class RestaurantPage:
         requests.post(notify_url, data=payload, headers=headers, files=files)
 
 
-restaurant = RestaurantPage(10, '19')
-restaurant.search_restaurant()
-restaurant.take_screenshot()
-restaurant.send_line()
+# restaurant = RestaurantPage(10, '19')
+# restaurant.search_restaurant()
+# restaurant.take_screenshot()
+# restaurant.send_line()
