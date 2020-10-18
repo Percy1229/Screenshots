@@ -83,7 +83,7 @@ class Ticket(RestaurantPage):
                 ds_circle_num, ds_few_num, ds_available_day)
 
         else:
-            self.ds_state = 'TDL:現在、販売しておりません'
+            self.ds_state = 'TDS:現在、販売しておりません'
 
         # TDL circle and few AM8:00
 
