@@ -104,7 +104,8 @@ class Ticket(RestaurantPage):
                 self.s_total_date += '|{} '.format(date_num[2])
                 print(self.s_total_date)
                 # close modal
-                mdl = self.driver.find_element_by_css_selector('div.modalContent')
+                div_modal = 'div.modalContent'
+                mdl = self.driver.find_element_by_css_selector(div_modal)
                 c_btn = mdl.find_element_by_css_selector('div.modalBtnClose')
                 c_btn.click()
                 time.sleep(2)
@@ -215,7 +216,7 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-ticket1 = Ticket('11')
+ticket1 = Ticket('10')
 ticket1.take_pic()
 ticket1.set_message()
 ticket1.set_picture()
@@ -225,16 +226,16 @@ time.sleep(1)
 
 
 # ticket for next month
-# ticket2 = Ticket('11')
-# ticket2.take_pic()
-# ticket2.set_message()
-# ticket2.set_picture()
-# ticket2.send_line()
-#
-# time.sleep(1)
+ticket2 = Ticket('11')
+ticket2.take_pic()
+ticket2.set_message()
+ticket2.set_picture()
+ticket2.send_line()
+
+time.sleep(1)
 #
 # # Restaurant for this month only
-# restaurant = RestaurantPage('19', 10)
-# restaurant.search_restaurant()
-# restaurant.take_pic()
-# restaurant.send_line()
+restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
+restaurant.search_restaurant()
+restaurant.take_pic()
+restaurant.send_line()

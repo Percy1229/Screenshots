@@ -22,7 +22,7 @@ restaurant_url = 'https://reserve.tokyodisneyresort.jp/sp/restaurant/search/'
 
 
 class RestaurantPage:
-    def __init__(self, day, month=10, pick_res=None):
+    def __init__(self, day, month=11, pick_res=None):
         self.driver = webdriver.Chrome(executable_path=DRIVER_PATH,
                                        options=options)
         self.day = day
@@ -31,7 +31,7 @@ class RestaurantPage:
 
         self.title = 'レストラン'
         self.pic_name = 'restaurant'
-        self.res_status = '現在、予約できません。'
+        self.res_status = '選択されていません'
         self.cur_url = None
         os.chdir('{}/PycharmProjects/Screenshots/images'.format(
             os.environ['USER_PATH']))
@@ -76,22 +76,28 @@ class RestaurantPage:
                     break
 
         search_button = self.driver.find_element_by_id('searchButton')
-        time.sleep(2)
+        time.sleep(1)
         search_button.click()
-        restaurant_exist = self.driver.find_elements_by_css_selector('p.name')
-        for each_restaurant in restaurant_exist:
-            if each_restaurant.text == self.pick_res:
-                self.res_status = '現在、予約可能です。'
-                print('YES')
-                break
 
         self.cur_url = self.driver.current_url
+        time.sleep(1)
 
     def take_pic(self):
         try:
             self.driver.get(self.cur_url)
         except NoSuchElementException:
             print('つながりにくい状況です')
+
+        # search for available (selected restaurant)
+        if self.pick_res:
+            restaurant_exist = self.driver.find_element_by_css_selector(
+                'p.name')
+            if restaurant_exist.text == self.pick_res:
+                self.res_status = '{}: 予約できます\n{}'.format(
+                    self.pick_res, self.cur_url)
+
+            else:
+                self.res_status = '{}: 予約できません'.format(self.pick_res)
 
         # remove code
         self.driver.execute_script("""
@@ -110,7 +116,6 @@ class RestaurantPage:
 
     def send_line(self):
         notify_url = 'https://notify-api.line.me/api/notify'
-        # problem: token is exposed, hide it to bash.file
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
         files = {'imageFile': open("{}.png".format(self.pic_name), "rb")}
