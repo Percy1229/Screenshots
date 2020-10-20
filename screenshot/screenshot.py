@@ -37,6 +37,7 @@ class Ticket(RestaurantPage):
         self.dl_few_num = 0
 
         self.ds_state = 'TDS:現在、販売しておりません'
+        self.s_date_state = ''
         self.s_total_date = ''
         self.ds_available_day = 0
         self.ds_circle_num = 0
@@ -196,7 +197,7 @@ class Ticket(RestaurantPage):
         left = width - 1010
         top = 0
         right = width - 400
-        bottom = height - 62
+        bottom = height - 50
         image = screenshot.crop((left, top, right, bottom))
         image.save('{}.png'.format(self.pic_name))
 
@@ -238,13 +239,13 @@ time.sleep(1)
 
 
 # ticket for next month
-ticket2 = Ticket('11')
-ticket2.take_pic()
-ticket2.set_message()
-ticket2.set_picture()
-ticket2.send_line()
+# ticket2 = Ticket('11')
+# ticket2.take_pic()
+# ticket2.set_message()
+# ticket2.set_picture()
+# ticket2.send_line()
 
-time.sleep(1)
+# time.sleep(1)
 #
 # # Restaurant for this month only
 # restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
