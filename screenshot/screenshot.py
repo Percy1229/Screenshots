@@ -30,17 +30,19 @@ class Ticket(RestaurantPage):
         self.few = 0
 
         self.dl_state = 'TDL:現在、販売しておりません'
+        self.l_date_state = ''
+        self.l_total_date = ''
         self.dl_available_day = 0
         self.dl_circle_num = 0
         self.dl_few_num = 0
 
         self.ds_state = 'TDS:現在、販売しておりません'
+        self.s_total_date = ''
         self.ds_available_day = 0
         self.ds_circle_num = 0
         self.ds_few_num = 0
 
-        self.s_total_date = ''
-        self.date_state = '{}が販売しています'
+
 
     def take_pic(self):
         self.driver.get(ticket_url.format(self.day))
@@ -66,13 +68,19 @@ class Ticket(RestaurantPage):
         # TDL modal info
         if self.dl_few_num > 0:
             for content in dl_few:
+                # open modal
                 content.find_element_by_tag_name('a').click()
                 time.sleep(1)
+                # get date
+                l_date = self.driver.find_element_by_css_selector('h3.heading3')
+                date_num = re.findall(r'\d+', l_date.text)
+                self.l_total_date += '{} '.format(date_num[2])
+                # close modal
                 mdl = self.driver.find_element_by_css_selector(
                     'div.modalContent')
                 c_btn = mdl.find_element_by_css_selector('div.modalBtnClose')
                 c_btn.click()
-                time.sleep(2)
+                time.sleep(1)
 
         # total x
         dl_none = self.driver.find_elements_by_css_selector('div.tdl.is-none')
@@ -90,7 +98,6 @@ class Ticket(RestaurantPage):
         # total △
         ds_few = self.driver.find_elements_by_css_selector('div.tds.is-few')
         self.ds_few_num = len(ds_few)
-        print(self.ds_few_num)
 
         # TDS modal info
         if self.ds_few_num > 0:
@@ -101,14 +108,13 @@ class Ticket(RestaurantPage):
                 # get date
                 s_date = self.driver.find_element_by_css_selector('h3.heading3')
                 date_num = re.findall(r'\d+', s_date.text)
-                self.s_total_date += '|{} '.format(date_num[2])
-                print(self.s_total_date)
+                self.s_total_date += '{} '.format(date_num[2])
                 # close modal
-                div_modal = 'div.modalContent'
-                mdl = self.driver.find_element_by_css_selector(div_modal)
+                mdl = self.driver.find_element_by_css_selector(
+                    'div.modalContent')
                 c_btn = mdl.find_element_by_css_selector('div.modalBtnClose')
                 c_btn.click()
-                time.sleep(2)
+                time.sleep(1)
 
         # total x
         ds_none = self.driver.find_elements_by_css_selector('div.tds.is-none')
@@ -171,14 +177,17 @@ class Ticket(RestaurantPage):
             self.dl_state = 'TDL: ○ {} + △ {} = 残り{}枠です'.format(
                 self.dl_circle_num, self.dl_few_num, self.dl_available_day)
 
-        # set a message for line(TDS)
+        if self.l_total_date:
+            self.l_date_state = '日付: {}'.format(self.l_total_date)
+
+        # set a message for line(TDS)R
         if self.ds_available_day > 0:
             self.ds_state = 'TDS: ○ {} + △ {} = 残り{}枠です'.format(
                 self.ds_circle_num, self.ds_few_num, self.ds_available_day)
 
         if self.s_total_date:
-            self.date_state = self.date_state.format(self.s_total_date)
-            print(self.date_state)
+            self.s_date_state = '日付: {}'.format(self.s_total_date)
+
 
     def set_picture(self):
         # resize and cut the screenshot
@@ -193,16 +202,19 @@ class Ticket(RestaurantPage):
 
     def send_line(self):
         notify_url = 'https://notify-api.line.me/api/notify'
+        border = '-' * 5
         # problem: token is exposed, hide it to bash.file
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
-        text = '{title}\n{day}月\n{state}\n{date_state}\n{dl_state}\n{ds_state}'
+        text = '{title}\n{day}月\n{state}\n{b}\n{dl}\n{lds}\n{b}\n{ds}\n{sds}'
         text = text.format(title=self.title,
                            day=self.day,
                            state=self.state,
-                           date_state=self.date_state,
-                           dl_state=self.dl_state,
-                           ds_state=self.ds_state)
+                           b=border,
+                           dl=self.dl_state,
+                           lds=self.l_date_state,
+                           ds=self.ds_state,
+                           sds=self.s_date_state)
         payload = {'message': text}
         files = {'imageFile': open("{}.png".format(self.pic_name), "rb")}
         requests.post(notify_url, data=payload, headers=headers, files=files)
@@ -235,7 +247,7 @@ ticket2.send_line()
 time.sleep(1)
 #
 # # Restaurant for this month only
-restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
-restaurant.search_restaurant()
-restaurant.take_pic()
-restaurant.send_line()
+# restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
+# restaurant.search_restaurant()
+# restaurant.take_pic()
+# restaurant.send_line()
