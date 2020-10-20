@@ -43,8 +43,6 @@ class Ticket(RestaurantPage):
         self.ds_circle_num = 0
         self.ds_few_num = 0
 
-
-
     def take_pic(self):
         self.driver.get(ticket_url.format(self.day))
 
@@ -188,7 +186,6 @@ class Ticket(RestaurantPage):
 
         if self.s_total_date:
             self.s_date_state = '日付: {}'.format(self.s_total_date)
-
 
     def set_picture(self):
         # resize and cut the screenshot
