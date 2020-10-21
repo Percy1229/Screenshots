@@ -226,13 +226,13 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-ticket1 = Ticket('10')
-ticket1.take_pic()
-ticket1.set_message()
-ticket1.set_picture()
-ticket1.send_line()
-
-time.sleep(1)
+# ticket1 = Ticket('10')
+# ticket1.take_pic()
+# ticket1.set_message()
+# ticket1.set_picture()
+# ticket1.send_line()
+#
+# time.sleep(1)
 
 
 # ticket for next month
@@ -244,8 +244,8 @@ time.sleep(1)
 
 # time.sleep(1)
 #
-# # Restaurant for this month only
-# restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
-# restaurant.search_restaurant()
-# restaurant.take_pic()
-# restaurant.send_line()
+# Restaurant for this month only
+restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
+restaurant.search_restaurant()
+restaurant.take_pic()
+restaurant.send_line()

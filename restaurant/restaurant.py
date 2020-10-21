@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+import sys
 from datetime import date
 
 from selenium import webdriver
@@ -37,16 +38,19 @@ class RestaurantPage:
             os.environ['USER_PATH']))
 
     def search_restaurant(self):
+        self.driver.get(restaurant_url)
+
         try:
-            self.driver.get(restaurant_url)
+            calendar_img = self.driver.find_element_by_class_name(
+                'ui-datepicker-trigger')
+            calendar_img.click()
+            time.sleep(1)
         except NoSuchElementException:
-            print('つながりにくい状況です')
+            self.driver.quit()
+            print('レストラン: つながりにくい状況です')
+            sys.exit()
 
         # open calendar
-        calendar_img = self.driver.find_element_by_class_name(
-            'ui-datepicker-trigger')
-        calendar_img.click()
-        time.sleep(1)
 
         # set month
         this_month = date.today().month
