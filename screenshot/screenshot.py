@@ -43,7 +43,7 @@ class Ticket(RestaurantPage):
         self.ds_circle_num = 0
         self.ds_few_num = 0
 
-    def take_pic(self):
+    def get_info(self):
         self.driver.get(ticket_url.format(self.day))
 
         # total available day (TDR)
@@ -123,6 +123,7 @@ class Ticket(RestaurantPage):
         self.ds_circle_num = math.floor(sold_day - ds_few_none)
         self.ds_available_day = self.ds_circle_num + self.ds_few_num
 
+    def take_pic(self):
         # problem: need to split code - add self to define cal or message
         self.driver.execute_script("document.body.style.zoom='70%'")
 
@@ -131,22 +132,22 @@ class Ticket(RestaurantPage):
             instead, use js(node)
         """
         self.driver.execute_script("""
-                      var element = document.querySelector(".header-top");
+                              var element = document.querySelector(".header-top");
+                              if (element)
+                                  element.parentNode.removeChild(element);
+                              """)
+
+        self.driver.execute_script("""
+                      var element = document.querySelector(".header-submenu");
                       if (element)
                           element.parentNode.removeChild(element);
                       """)
 
         self.driver.execute_script("""
-              var element = document.querySelector(".header-submenu");
-              if (element)
-                  element.parentNode.removeChild(element);
-              """)
-
-        self.driver.execute_script("""
-              var element = document.querySelector(".header-globalmenu");
-              if (element)
-                  element.parentNode.removeChild(element);
-              """)
+                      var element = document.querySelector(".header-globalmenu");
+                      if (element)
+                          element.parentNode.removeChild(element);
+                      """)
 
         # scroll down
         target = self.driver.find_element_by_class_name('heading2')
@@ -226,17 +227,19 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-# ticket1 = Ticket('10')
-# ticket1.take_pic()
-# ticket1.set_message()
-# ticket1.set_picture()
-# ticket1.send_line()
-#
-# time.sleep(1)
+ticket1 = Ticket('11')
+ticket1.get_info()
+ticket1.take_pic()
+ticket1.set_message()
+ticket1.set_picture()
+ticket1.send_line()
+
+time.sleep(1)
 
 
 # ticket for next month
 # ticket2 = Ticket('11')
+# ticket2.get_info()
 # ticket2.take_pic()
 # ticket2.set_message()
 # ticket2.set_picture()
@@ -245,7 +248,7 @@ class Ticket(RestaurantPage):
 # time.sleep(1)
 #
 # Restaurant for this month only
-restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
-restaurant.search_restaurant()
-restaurant.take_pic()
-restaurant.send_line()
+# restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
+# restaurant.search_restaurant()
+# restaurant.take_pic()
+# restaurant.send_line()

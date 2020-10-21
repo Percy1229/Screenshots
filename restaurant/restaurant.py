@@ -88,6 +88,7 @@ class RestaurantPage:
 
     def take_pic(self):
         try:
+            # もしかしたら必要ない可能性がある
             self.driver.get(self.cur_url)
         except NoSuchElementException:
             print('つながりにくい状況です')
