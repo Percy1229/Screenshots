@@ -43,6 +43,9 @@ class Ticket(RestaurantPage):
         self.ds_circle_num = 0
         self.ds_few_num = 0
 
+        self.dl_available_url = []
+        self.ds_available_url = []
+
     def get_info(self):
         self.driver.get(ticket_url.format(self.day))
 
@@ -74,6 +77,10 @@ class Ticket(RestaurantPage):
                 l_date = self.driver.find_element_by_css_selector('h3.heading3')
                 date_num = re.findall(r'\d+', l_date.text)
                 self.l_total_date += '{} '.format(date_num[2])
+                # get_url
+                btn = self.driver.find_element_by_css_selector('a.ticket-url')
+                available_url = btn.get_attribute('href')
+                self.dl_available_url = available_url
                 # close modal
                 mdl = self.driver.find_element_by_css_selector(
                     'div.modalContent')
@@ -108,6 +115,9 @@ class Ticket(RestaurantPage):
                 s_date = self.driver.find_element_by_css_selector('h3.heading3')
                 date_num = re.findall(r'\d+', s_date.text)
                 self.s_total_date += '{} '.format(date_num[2])
+                # get_url
+                btn = self.driver.find_element_by_css_selector('a.ticket-url')
+                self.ds_available_url.append(btn.get_attribute('href'))
                 # close modal
                 mdl = self.driver.find_element_by_css_selector(
                     'div.modalContent')
@@ -161,7 +171,42 @@ class Ticket(RestaurantPage):
 
         # screenshot and save
         self.driver.save_screenshot(FILENAME)
-        self.driver.quit()
+
+    def search_available(self):
+        times = 0
+        for url in self.ds_available_url:
+            times += 1
+            self.driver.get(url)
+            time.sleep(1)
+            caution = self.driver.find_elements_by_css_selector('p.text-caution')
+            if len(caution) == 3:
+                pass
+            else:
+                # ticket_list = self.driver.find_element_by_css_selector('ul.list-card')
+                cards = self.driver.find_elements_by_css_selector('div.search-ticket-card')
+                for card in cards:
+                    title = card.find_element_by_css_selector('h4.heading-cont-top')
+                    print(title.text)
+                    card.click()
+                    # d_d = self.driver.find_element_by_css_selector(
+                    #     'search-1day-time-01.pgh-note')
+
+                    # d_btn = self.driver.find_element_by_css_selector(
+                    #     'search-1day-01.button'
+                    # )
+                    # d_s = self.driver.find_element_by_css_selector(
+                    #     'span.search-1day-time-02')
+                    time.sleep(2)
+                    # print(d_d.text)
+                    # print(d_btn.text)
+                    # print(d_s.text)
+                    time.sleep(2)
+                    back = self.driver.find_element_by_css_selector('a.search-slide-back')
+                    back.click()
+                    time.sleep(2)
+            time.sleep(2)
+            if len(self.ds_available_url) == times:
+                self.driver.quit()
 
     def set_message(self):
         # set a message for line(TDR)
@@ -179,6 +224,7 @@ class Ticket(RestaurantPage):
 
         if self.l_total_date:
             self.l_date_state = '日付: {}'.format(self.l_total_date)
+
 
         # set a message for line(TDS)R
         if self.ds_available_day > 0:
@@ -227,27 +273,28 @@ class Ticket(RestaurantPage):
 #     time.sleep(2)
 
 # ticket for this month
-ticket1 = Ticket('11')
-ticket1.get_info()
-ticket1.take_pic()
-ticket1.set_message()
-ticket1.set_picture()
-ticket1.send_line()
-
-time.sleep(1)
+# ticket1 = Ticket('10')
+# ticket1.get_info()
+# ticket1.take_pic()
+# ticket1.set_message()
+# ticket1.set_picture()
+# ticket1.send_line()
+#
+# time.sleep(1)
 
 
 # ticket for next month
-# ticket2 = Ticket('11')
-# ticket2.get_info()
-# ticket2.take_pic()
-# ticket2.set_message()
-# ticket2.set_picture()
-# ticket2.send_line()
+ticket2 = Ticket('11')
+ticket2.get_info()
+ticket2.take_pic()
+ticket2.search_available()
+ticket2.set_message()
+ticket2.set_picture()
+ticket2.send_line()
 
 # time.sleep(1)
 #
-# Restaurant for this month only
+# # # Restaurant for this month only
 # restaurant = RestaurantPage('19', 11, 'ラ・タベルヌ・ド・ガストン')
 # restaurant.search_restaurant()
 # restaurant.take_pic()
