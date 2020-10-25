@@ -174,33 +174,41 @@ class Ticket(RestaurantPage):
 
     def search_available(self):
         times = 0
+        # problem: サイトアクセス集中のため、例外処理が必要
         for url in self.ds_available_url:
             times += 1
             self.driver.get(url)
-            time.sleep(1)
+            time.sleep(3)
             caution = self.driver.find_elements_by_css_selector('p.text-caution')
             if len(caution) == 3:
-                pass
+                # pass
+                print('done')
+                time.sleep(1)
             else:
-                # ticket_list = self.driver.find_element_by_css_selector('ul.list-card')
                 cards = self.driver.find_elements_by_css_selector('div.search-ticket-card')
+                print(len(cards))
                 for card in cards:
                     title = card.find_element_by_css_selector('h4.heading-cont-top')
                     print(title.text)
                     card.click()
-                    # d_d = self.driver.find_element_by_css_selector(
-                    #     'search-1day-time-01.pgh-note')
+                    time.sleep(2)
 
-                    # d_btn = self.driver.find_element_by_css_selector(
-                    #     'search-1day-01.button'
-                    # )
-                    # d_s = self.driver.find_element_by_css_selector(
-                    #     'span.search-1day-time-02')
-                    time.sleep(2)
-                    # print(d_d.text)
-                    # print(d_btn.text)
-                    # print(d_s.text)
-                    time.sleep(2)
+                    # problem: 処理が多いため、パーク名を照らし合わせて検索をかけるべき
+                    tdl_name = self.driver.find_element_by_class_name(
+                        'search-1day-01')
+                    print(tdl_name.text)
+                    sell_tdl = self.driver.find_element_by_class_name(
+                        'search-1day-time-01')
+                    print(sell_tdl.text)
+
+                    tds_name = self.driver.find_element_by_class_name(
+                        'search-1day-02')
+                    print(tds_name.text)
+                    sell_tds = self.driver.find_element_by_class_name(
+                        'search-1day-time-02')
+                    print(sell_tds.text)
+
+                    time.sleep(1)
                     back = self.driver.find_element_by_css_selector('a.search-slide-back')
                     back.click()
                     time.sleep(2)
