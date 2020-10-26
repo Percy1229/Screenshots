@@ -272,9 +272,10 @@ class Ticket(RestaurantPage):
                             pass
                         else:
                             test = 'yes'
-                            self.tds_available_status.append('{}| {}| {}'.format(
-                                self.l_date[i], tds_name.text, test
-                            ))
+                            self.tds_available_status.append(
+                                '{}| {}| {}\n'.format(
+                                    self.l_date[i], tds_name.text, test
+                                ))
                             print(self.tds_available_status)
 
                         time.sleep(1)
@@ -316,7 +317,7 @@ class Ticket(RestaurantPage):
 
         if len(self.tds_available_status) >= 2:
             for a in self.tds_available_status:
-                test1 = ' '
+                test1 = ''
                 test1 += a
         elif len(self.tds_available_status) == 1:
             self.test1 = self.tds_available_status[0]
