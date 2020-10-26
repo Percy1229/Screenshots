@@ -7,6 +7,7 @@ import re
 # import schedule
 from PIL import Image
 from restaurant.restaurant import RestaurantPage
+from selenium.common.exceptions import NoSuchElementException
 
 # set image directory
 image_dir = '../images/ticket.png'
@@ -73,11 +74,12 @@ class Ticket(RestaurantPage):
                 # open modal
                 content.find_element_by_tag_name('a').click()
                 time.sleep(1)
-                # get date
+                # get -月-日の販売状況
                 l_date = self.driver.find_element_by_css_selector('h3.heading3')
+                print(l_date.text)
                 date_num = re.findall(r'\d+', l_date.text)
                 self.l_total_date += '{} '.format(date_num[2])
-                # get_url
+                # get ticket available url
                 btn = self.driver.find_element_by_css_selector('a.ticket-url')
                 self.dl_available_url.append(btn.get_attribute('href'))
                 # close modal
@@ -112,6 +114,7 @@ class Ticket(RestaurantPage):
                 time.sleep(1)
                 # get date
                 s_date = self.driver.find_element_by_css_selector('h3.heading3')
+                print(s_date.text)
                 date_num = re.findall(r'\d+', s_date.text)
                 self.s_total_date += '{} '.format(date_num[2])
                 # get_url
@@ -174,107 +177,87 @@ class Ticket(RestaurantPage):
         self.driver.save_screenshot(FILENAME)
 
     # problem: too long func so need to split search-available
-    def search_available(self):
-        # l_times = 0
-        # problem: サイトアクセス集中のため、例外処理が必要
-
-        print(len(self.dl_available_url))
-        for url in self.dl_available_url:
-            # l_times += 1
-            # print(l_times)
-            self.driver.get(url)
-            time.sleep(3)
-            caution = self.driver.find_elements_by_css_selector(
-                'p.text-caution')
-            if len(caution) == 3:
-                # pass
-                time.sleep(1)
-            else:
-                cards = self.driver.find_elements_by_css_selector(
-                    'div.search-ticket-card')
-                # num of cards
-                for card in cards:
-                    # passport type
-                    passport = card.find_element_by_css_selector(
-                        'h4.heading-cont-top')
-                    print(passport.text)
-                    card.click()
-                    time.sleep(2)
-
-                    # problem: 処理が多いため、パーク名を照らし合わせて検索をかけるべき
-                    # 日付もできていない
-                    tdl_name = self.driver.find_element_by_class_name(
-                        'search-1day-01')
-                    print(tdl_name.text)
-                    sell_tdl = self.driver.find_element_by_class_name(
-                        'search-1day-time-01')
-                    print(sell_tdl.text)
-
-                    tds_name = self.driver.find_element_by_class_name(
-                        'search-1day-02')
-                    print(tds_name.text)
-                    sell_tds = self.driver.find_element_by_class_name(
-                        'search-1day-time-02')
-                    print(sell_tds.text)
-
+    def search_dl_available(self):
+        try:
+            for url in self.dl_available_url:
+                self.driver.get(url)
+                time.sleep(2)
+                caution = self.driver.find_elements_by_css_selector(
+                    'p.text-caution')
+                if len(caution) == 3:
+                    # pass
                     time.sleep(1)
-                    back = self.driver.find_element_by_css_selector(
-                        'a.search-slide-back')
-                    back.click()
-                    time.sleep(2)
+                else:
+                    cards = self.driver.find_elements_by_css_selector(
+                        'div.search-ticket-card')
+                    # num of cards
+                    for card in cards:
+                        # passport type
+                        passport = card.find_element_by_css_selector(
+                            'h4.heading-cont-top')
+                        print(passport.text)
+                        card.click()
+                        time.sleep(1)
+                        # 東京ディズニーランド
+                        tdl_name = self.driver.find_element_by_class_name(
+                            'search-1day-01')
+                        print(tdl_name.text)
+                        # 9:00 ~ 21:00 or 販売しておりません
+                        sell_tdl = self.driver.find_element_by_class_name(
+                            'search-1day-time-01')
+                        print(sell_tdl.text)
+                        time.sleep(1)
+                        back = self.driver.find_element_by_css_selector(
+                            'a.search-slide-back')
+                        back.click()
+                        time.sleep(2)
 
-                # if len(self.ds_available_url) == l_times:
-                #     time.sleep(2)
-                #     print('activate')
-                #     # self.driver.quit()
+        except NoSuchElementException:
+            print('ただいまつながりにくい状況です')
 
-        s_times = 0
-        for url in self.ds_available_url:
-            s_times += 1
-            self.driver.get(url)
-            time.sleep(3)
-            caution = self.driver.find_elements_by_css_selector(
-                'p.text-caution')
-            print(len(caution))
-            if len(caution) == 3:
-                # pass
-                print('done')
-                time.sleep(1)
-            else:
-                cards = self.driver.find_elements_by_css_selector(
-                    'div.search-ticket-card')
-                print(len(cards))
-                for card in cards:
-                    title = card.find_element_by_css_selector(
-                        'h4.heading-cont-top')
-                    print(title.text)
-                    card.click()
-                    time.sleep(2)
-
-                    # problem: 処理が多いため、パーク名を照らし合わせて検索をかけるべき
-                    # 日付もできていない
-                    tdl_name = self.driver.find_element_by_class_name(
-                        'search-1day-01')
-                    print(tdl_name.text)
-                    sell_tdl = self.driver.find_element_by_class_name(
-                        'search-1day-time-01')
-                    print(sell_tdl.text)
-
-                    tds_name = self.driver.find_element_by_class_name(
-                        'search-1day-02')
-                    print(tds_name.text)
-                    sell_tds = self.driver.find_element_by_class_name(
-                        'search-1day-time-02')
-                    print(sell_tds.text)
-
+    def search_ds_available(self):
+        try:
+            times = 0
+            for url in self.ds_available_url:
+                times += 1
+                self.driver.get(url)
+                time.sleep(2)
+                caution = self.driver.find_elements_by_css_selector(
+                    'p.text-caution')
+                print(len(caution))
+                if len(caution) == 3:
+                    # pass
+                    print('done')
                     time.sleep(1)
-                    back = self.driver.find_element_by_css_selector(
-                        'a.search-slide-back')
-                    back.click()
-                    time.sleep(2)
-            time.sleep(2)
-            if len(self.ds_available_url) == s_times:
-                self.driver.quit()
+                else:
+                    cards = self.driver.find_elements_by_css_selector(
+                        'div.search-ticket-card')
+                    for card in cards:
+                        # passport type
+                        title = card.find_element_by_css_selector(
+                            'h4.heading-cont-top')
+                        print(title.text)
+                        card.click()
+                        time.sleep(2)
+                        # 東京ディズニーシー
+                        tds_name = self.driver.find_element_by_class_name(
+                            'search-1day-02')
+                        print(tds_name.text)
+                        # 9:00 ~ 21:00 or 販売しておりません
+                        sell_tds = self.driver.find_element_by_class_name(
+                            'search-1day-time-02')
+                        print(sell_tds.text)
+                        time.sleep(1)
+                        back = self.driver.find_element_by_css_selector(
+                            'a.search-slide-back')
+                        back.click()
+                        time.sleep(2)
+                time.sleep(2)
+                if len(self.ds_available_url) == times:
+                    self.driver.quit()
+
+        except NoSuchElementException:
+            print('つながりにくい状況です')
 
     def set_message(self):
         # set a message for line(TDR)
@@ -354,7 +337,8 @@ class Ticket(RestaurantPage):
 ticket2 = Ticket('11')
 ticket2.get_info()
 ticket2.take_pic()
-ticket2.search_available()
+ticket2.search_dl_available()
+ticket2.search_ds_available()
 ticket2.set_message()
 ticket2.set_picture()
 ticket2.send_line()
