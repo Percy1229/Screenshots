@@ -141,7 +141,8 @@ class Ticket(RestaurantPage):
             instead, use js(node)
         """
         self.driver.execute_script("""
-                              var element = document.querySelector(".header-top");
+                              var element = document.querySelector(
+                              ".header-top");
                               if (element)
                                   element.parentNode.removeChild(element);
                               """)
@@ -153,7 +154,8 @@ class Ticket(RestaurantPage):
                       """)
 
         self.driver.execute_script("""
-                      var element = document.querySelector(".header-globalmenu");
+                      var element = document.querySelector(
+                      ".header-globalmenu");
                       if (element)
                           element.parentNode.removeChild(element);
                       """)
@@ -182,7 +184,8 @@ class Ticket(RestaurantPage):
             # print(l_times)
             self.driver.get(url)
             time.sleep(3)
-            caution = self.driver.find_elements_by_css_selector('p.text-caution')
+            caution = self.driver.find_elements_by_css_selector(
+                'p.text-caution')
             if len(caution) == 3:
                 # pass
                 time.sleep(1)
@@ -238,10 +241,12 @@ class Ticket(RestaurantPage):
                 print('done')
                 time.sleep(1)
             else:
-                cards = self.driver.find_elements_by_css_selector('div.search-ticket-card')
+                cards = self.driver.find_elements_by_css_selector(
+                    'div.search-ticket-card')
                 print(len(cards))
                 for card in cards:
-                    title = card.find_element_by_css_selector('h4.heading-cont-top')
+                    title = card.find_element_by_css_selector(
+                        'h4.heading-cont-top')
                     print(title.text)
                     card.click()
                     time.sleep(2)
@@ -263,7 +268,8 @@ class Ticket(RestaurantPage):
                     print(sell_tds.text)
 
                     time.sleep(1)
-                    back = self.driver.find_element_by_css_selector('a.search-slide-back')
+                    back = self.driver.find_element_by_css_selector(
+                        'a.search-slide-back')
                     back.click()
                     time.sleep(2)
             time.sleep(2)
@@ -286,7 +292,6 @@ class Ticket(RestaurantPage):
 
         if self.l_total_date:
             self.l_date_state = '日付: {}'.format(self.l_total_date)
-
 
         # set a message for line(TDS)R
         if self.ds_available_day > 0:
