@@ -47,6 +47,11 @@ class Ticket(RestaurantPage):
         self.s_date = []
         self.ds_available_url = []
 
+        self.tdl_available_status = ''
+        self.tdl_passport = ''
+        self.tds_available_status = []
+        self.tds_passport = ''
+
     def get_info(self):
         self.driver.get(ticket_url.format(self.day))
 
@@ -178,6 +183,9 @@ class Ticket(RestaurantPage):
         # screenshot and save
         self.driver.save_screenshot(FILENAME)
 
+        if self.dl_few_num == 0 or self.ds_few_num == 0:
+            self.driver.quit()
+
     # problem: too long func so need to split search-available
     def search_dl_available(self):
         try:
@@ -192,32 +200,38 @@ class Ticket(RestaurantPage):
                     i += 1
                     time.sleep(2)
                 else:
-                    print(self.l_date[i])
-                    i += 1
                     cards = self.driver.find_elements_by_css_selector(
                         'div.search-ticket-card')
                     # num of cards
                     for card in cards:
                         # passport type
-                        passport = card.find_element_by_css_selector(
+                        tdl_passport = card.find_element_by_css_selector(
                             'h4.heading-cont-top')
-                        print(passport.text)
+                        self.tdl_passport = tdl_passport.text
+                        print(self.tdl_passport)
                         card.click()
                         time.sleep(3)
                         # 東京ディズニーランド
                         tdl_name = self.driver.find_element_by_class_name(
                             'search-1day-01')
-                        print(tdl_name.text)
                         # 9:00 ~ 21:00 or 販売しておりません
                         sell_tdl = self.driver.find_element_by_class_name(
                             'search-1day-time-01')
-                        print(sell_tdl.text)
-                        print('#' * 10)
-                        time.sleep(2)
+                        if sell_tdl.text == '現在、販売していません':
+                            pass
+                        else:
+                            test = 'yes'
+                            self.tdl_available_status = '{}| {}| {}'.format(
+                                self.l_date[i], tdl_name.text, test
+                            )
+                            print(self.tdl_available_status)
+
+                        time.sleep(1)
                         back = self.driver.find_element_by_css_selector(
                             'a.search-slide-back')
                         back.click()
                         time.sleep(2)
+                    i += 1
 
         except NoSuchElementException:
             print('ただいまつながりにくい状況です')
@@ -237,25 +251,32 @@ class Ticket(RestaurantPage):
                     i += 1
                     time.sleep(2)
                 else:
-                    print(self.s_date[i])
                     i += 1
                     cards = self.driver.find_elements_by_css_selector(
                         'div.search-ticket-card')
                     for card in cards:
                         # passport type
-                        title = card.find_element_by_css_selector(
+                        tds_passport = card.find_element_by_css_selector(
                             'h4.heading-cont-top')
-                        print(title.text)
+                        self.tds_passport = tds_passport.text
+                        print(self.tds_passport)
                         card.click()
                         time.sleep(3)
                         # 東京ディズニーシー
                         tds_name = self.driver.find_element_by_class_name(
                             'search-1day-02')
-                        print(tds_name.text)
                         # 9:00 ~ 21:00 or 販売しておりません
                         sell_tds = self.driver.find_element_by_class_name(
                             'search-1day-time-02')
-                        print(sell_tds.text)
+                        if sell_tds.text == '現在、販売していません':
+                            pass
+                        else:
+                            test = 'yes'
+                            self.tds_available_status.append('{}| {}| {}'.format(
+                                self.l_date[i], tds_name.text, test
+                            ))
+                            print(self.tds_available_status)
+
                         time.sleep(1)
                         back = self.driver.find_element_by_css_selector(
                             'a.search-slide-back')
@@ -293,6 +314,16 @@ class Ticket(RestaurantPage):
         if self.s_total_date:
             self.s_date_state = '日付: {}'.format(self.s_total_date)
 
+        if len(self.tds_available_status) >= 2:
+            for a in self.tds_available_status:
+                test1 = ' '
+                test1 += a
+        elif len(self.tds_available_status) == 1:
+            self.test1 = self.tds_available_status[0]
+        else:
+            self.test1 = 'no data'
+
+
     def set_picture(self):
         # resize and cut the screenshot
         screenshot = Image.open('ticket.png')
@@ -310,6 +341,17 @@ class Ticket(RestaurantPage):
         # problem: token is exposed, hide it to bash.file
         line_notify_token = os.environ['LINE_NOTIFY_TOKEN']
         headers = {'Authorization': 'Bearer ' + line_notify_token}
+        """
+        11月
+        TDR：残り８枠です
+        -----
+        TDL: ○ + △ = 残り3枠です
+        日付: 9 25 26
+        -----
+        TDS: ○ + △ = 残り3枠です
+        日付: 1 2 3
+        """
+
         text = '{title}\n{day}月\n{state}\n{b}\n{dl}\n{lds}\n{b}\n{ds}\n{sds}'
         text = text.format(title=self.title,
                            day=self.day,
