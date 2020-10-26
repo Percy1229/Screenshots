@@ -15,8 +15,6 @@ image_dir = '../images/ticket.png'
 # Select File for screenshots
 FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_dir)
 
-'https://www.tokyodisneyresort.jp/ticket/sales_status/202019/'
-
 ticket_url = "https://www.tokyodisneyresort.jp/ticket/sales_status/2020{}/"
 
 
@@ -44,7 +42,9 @@ class Ticket(RestaurantPage):
         self.ds_circle_num = 0
         self.ds_few_num = 0
 
+        self.l_date = []
         self.dl_available_url = []
+        self.s_date = []
         self.ds_available_url = []
 
     def get_info(self):
@@ -75,8 +75,10 @@ class Ticket(RestaurantPage):
                 content.find_element_by_tag_name('a').click()
                 time.sleep(1)
                 # get -月-日の販売状況
-                l_date = self.driver.find_element_by_css_selector('h3.heading3')
-                print(l_date.text)
+                l_date = self.driver.find_element_by_css_selector(
+                    'h3.heading3')
+                self.l_date.append(l_date.text)
+                # day available △
                 date_num = re.findall(r'\d+', l_date.text)
                 self.l_total_date += '{} '.format(date_num[2])
                 # get ticket available url
@@ -92,7 +94,6 @@ class Ticket(RestaurantPage):
         # total x
         dl_none = self.driver.find_elements_by_css_selector('div.tdl.is-none')
         dl_none_num = len(dl_none)
-
         # open modal and check available day
         # now sold day
         sold_day = (self.few + none + self.circle) / 2
@@ -112,9 +113,10 @@ class Ticket(RestaurantPage):
                 # open modal
                 content.find_element_by_tag_name('a').click()
                 time.sleep(1)
-                # get date
+                # get -月-日の販売状況
                 s_date = self.driver.find_element_by_css_selector('h3.heading3')
-                print(s_date.text)
+                self.s_date.append(s_date.text)
+                # day available △
                 date_num = re.findall(r'\d+', s_date.text)
                 self.s_total_date += '{} '.format(date_num[2])
                 # get_url
@@ -179,15 +181,19 @@ class Ticket(RestaurantPage):
     # problem: too long func so need to split search-available
     def search_dl_available(self):
         try:
+            i = 0
             for url in self.dl_available_url:
                 self.driver.get(url)
-                time.sleep(2)
+                time.sleep(5)
                 caution = self.driver.find_elements_by_css_selector(
                     'p.text-caution')
                 if len(caution) == 3:
                     # pass
-                    time.sleep(1)
+                    i += 1
+                    time.sleep(2)
                 else:
+                    print(self.l_date[i])
+                    i += 1
                     cards = self.driver.find_elements_by_css_selector(
                         'div.search-ticket-card')
                     # num of cards
@@ -197,7 +203,7 @@ class Ticket(RestaurantPage):
                             'h4.heading-cont-top')
                         print(passport.text)
                         card.click()
-                        time.sleep(1)
+                        time.sleep(3)
                         # 東京ディズニーランド
                         tdl_name = self.driver.find_element_by_class_name(
                             'search-1day-01')
@@ -206,7 +212,8 @@ class Ticket(RestaurantPage):
                         sell_tdl = self.driver.find_element_by_class_name(
                             'search-1day-time-01')
                         print(sell_tdl.text)
-                        time.sleep(1)
+                        print('#' * 10)
+                        time.sleep(2)
                         back = self.driver.find_element_by_css_selector(
                             'a.search-slide-back')
                         back.click()
@@ -217,6 +224,7 @@ class Ticket(RestaurantPage):
 
     def search_ds_available(self):
         try:
+            i = 0
             times = 0
             for url in self.ds_available_url:
                 times += 1
@@ -224,12 +232,13 @@ class Ticket(RestaurantPage):
                 time.sleep(2)
                 caution = self.driver.find_elements_by_css_selector(
                     'p.text-caution')
-                print(len(caution))
                 if len(caution) == 3:
                     # pass
-                    print('done')
-                    time.sleep(1)
+                    i += 1
+                    time.sleep(2)
                 else:
+                    print(self.s_date[i])
+                    i += 1
                     cards = self.driver.find_elements_by_css_selector(
                         'div.search-ticket-card')
                     for card in cards:
@@ -238,7 +247,7 @@ class Ticket(RestaurantPage):
                             'h4.heading-cont-top')
                         print(title.text)
                         card.click()
-                        time.sleep(2)
+                        time.sleep(3)
                         # 東京ディズニーシー
                         tds_name = self.driver.find_element_by_class_name(
                             'search-1day-02')
